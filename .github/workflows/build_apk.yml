@@ -17,9 +17,21 @@ jobs:
       - name: Extract Flutter project
         run: |
           unzip -q SmartExam_fixed.zip -d extracted
-          cd extracted/SmartExam_fixed
-          test -f pubspec.yaml
-          test -d android
+          test -f extracted/SmartExam_fixed/pubspec.yaml
+          test -d extracted/SmartExam_fixed/android
+
+      - name: Install Android SDK 36
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-36" "build-tools;35.0.0"
+
+      - name: Set compileSdk to 36
+        working-directory: extracted/SmartExam_fixed
+        run: |
+          find android -type f \( -name "*.gradle" -o -name "*.gradle.kts" \) -print0 | \
+          xargs -0 sed -i \
+          -e 's/compileSdkVersion[[:space:]]*34/compileSdkVersion 36/g' \
+          -e 's/compileSdk[[:space:]]*=[[:space:]]*34/compileSdk = 36/g'
 
       - name: Setup Java
         uses: actions/setup-java@v4
