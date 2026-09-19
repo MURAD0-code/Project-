@@ -1,0 +1,48 @@
+name: Build SmartExam APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Flutter project
+        run: |
+          unzip -q SmartExam_fixed.zip -d extracted
+          cd extracted/SmartExam_fixed
+          test -f pubspec.yaml
+          test -d android
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        working-directory: extracted/SmartExam_fixed
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: extracted/SmartExam_fixed
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartExam-APK
+          path: extracted/SmartExam_fixed/build/app/outputs/flutter-apk/app-release.apk
