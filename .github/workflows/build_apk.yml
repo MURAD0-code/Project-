@@ -17,12 +17,14 @@ jobs:
       - name: Extract Flutter project
         run: |
           unzip -q SmartExam_fixed.zip -d extracted
+          echo "=== Extracted files ==="
+          find extracted -maxdepth 3 -type f -name "pubspec.yaml" -print
+          echo "======================"
           test -f extracted/SmartExam_fixed/pubspec.yaml
-          test -d extracted/SmartExam_fixed/android
 
-            - name: Setup Android SDK
-                uses: android-actions/setup-android@v4
-                with:
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
           packages: 'platforms;android-36 build-tools;35.0.0'
 
       - name: Set compileSdk to 36
